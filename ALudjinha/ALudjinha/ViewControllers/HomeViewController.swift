@@ -15,21 +15,27 @@ class HomeViewController: UIViewController, Alerts {
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var bannerView: UIView!
-    private var viewModel: BannerViewModel!
+    private var bannerViewModel: BannerViewModel!
+    private var categsViewModel: CategoriasViewModel!
+    private var produtosViewModel: ProdutosViewModel!
     var numberOfScrolls = CGFloat(3)
     private var bannersImageView: [UIImageView] = []
     private var bannerActivityInd: [UIActivityIndicatorView] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        viewModel = BannerViewModel(delegate: self)
+        bannerViewModel = BannerViewModel(delegate: self)
+        categsViewModel = CategoriasViewModel(delegate: self)
+        produtosViewModel = ProdutosViewModel(delegate: self)
         scrollView.delegate = self
-        tableView.delegate = self
+        //tableView.delegate = self
         tableView.dataSource = self
-        collectionView.delegate = self
+        //collectionView.delegate = self
         collectionView.dataSource = self
         preLoadBannersView()
-        viewModel.fetchBanners()
+        bannerViewModel.fetchBanners()
+        categsViewModel.fetchCategorias()
+        produtosViewModel.fetchMaisVendidos()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -41,7 +47,8 @@ class HomeViewController: UIViewController, Alerts {
         navigationBar?.topItem?.titleView = imageView
         setUpScrollBanners()
         getDotsFeedback()
-        viewModel.fetchBanners()
+        bannerViewModel.fetchBanners()
+        categsViewModel.fetchCategorias()
     }
 
     func preLoadBannersView() {
@@ -65,9 +72,9 @@ class HomeViewController: UIViewController, Alerts {
     }
     
     func setUpScrollBanners() {
-        if (viewModel.currentCount > 0) {
+        if (bannerViewModel.currentCount > 0) {
             for i in 0..<Int(numberOfScrolls) {
-                bannersImageView[i].loadBannerWithUrl(bannerUrl: viewModel.banner(at: i).urlImagem) { result in
+                bannersImageView[i].loadBannerWithUrl(bannerUrl: bannerViewModel.banner(at: i).urlImagem) { result in
                     switch result {
                     case .failure(let error):
                         DispatchQueue.main.async {
@@ -115,41 +122,44 @@ extension HomeViewController: UIScrollViewDelegate {
 }
 
 extension HomeViewController: BannerViewModelDelegate {
-    func fetchCompleted() {
+    func fetchBannersCompleted() {
         setUpScrollBanners()
     }
     
-    func fetchFailed(with reason: String) {
+    func fetchBannersFailed(with reason: String) {
         let action = UIAlertAction(title: "Ok", style: .default, handler: nil)
         displayAlert(with: "Alerta", message: "Falha ao carregar imagens da internet.", actions: [action])
     }
 }
 
-extension HomeViewController: UITableViewDelegate {
-    //tableView.
-    
-}
-
 extension HomeViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 7
+        if produtosViewModel.maisVendidosCount > 0 {
+            return produtosViewModel.maisVendidosCount
+        } else{
+            return 1
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "tableCell", for: indexPath)
-        cell.textLabel?.text = "Teste"
+        let cell = tableView.dequeueReusableCell(withIdentifier: "tableCell", for: indexPath) as! MaisVendidosTableViewCell
+        if produtosViewModel.maisVendidosCount > 0 {
+            cell.setCell(with: produtosViewModel.maisVendidos(at: indexPath.row))
+        } else{
+            cell.textLabel?.text = ""
+        }
         return cell
     }
     
 }
 
-extension HomeViewController: UICollectionViewDelegate {
-    
-}
-
 extension HomeViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 7
+        if categsViewModel.currentCount > 0 {
+            return categsViewModel.currentCount
+        } else{
+            return 1
+        }
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -157,9 +167,44 @@ extension HomeViewController: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "collectionCell", for: indexPath)
-        cell.backgroundView?.backgroundColor = .blue
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "collectionCell", for: indexPath) as! CategoriasCollectionViewCell
+        if categsViewModel.currentCount > 0 {
+            cell.setCell(with: categsViewModel.categorias(at: indexPath.item))
+        } else {
+            cell.backgroundView?.backgroundColor = .blue
+            cell.setCell(with: .none)
+        }
         return cell
+    }
+    
+    
+}
+
+extension HomeViewController: CategoriasViewModelDelegate {
+    func fetchCategsCompleted() {
+        DispatchQueue.main.async {
+            self.collectionView.reloadData()
+        }
+    }
+    
+    func fetchCategsFailed(with reason: String) {
+        let title = "Alerta"
+        let action = UIAlertAction(title: "OK", style: .default)
+        displayAlert(with: title , message: reason, actions: [action])
+    }
+}
+
+extension HomeViewController: ProdutosViewModelDelegate {
+    func fetchMaisVendidosCompleted() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    }
+    
+    func fetchMaisVendidosFailed(with reason: String) {
+        let title = "Alerta"
+        let action = UIAlertAction(title: "OK", style: .default)
+        displayAlert(with: title , message: reason, actions: [action])
     }
     
     

@@ -35,4 +35,28 @@ extension UIImageView {
         }).resume()
     }
     
+    func loadCategWithUrl(categUrl: String, completion: @escaping (Result<CategoriaImageUrlResponse, ResponseError>) -> Void) {
+        let url = URL(string: categUrl)
+        image = nil
+        if let imageFromCache = imgCache.object(forKey: url as AnyObject) as? UIImage {
+            self.image = imageFromCache
+            let categoria = CategoriaImageUrlResponse.init(categoriaImage: self.image!)
+            completion(Result.success(categoria))
+            return
+        }
+        URLSession.shared.dataTask(with: url!, completionHandler: { data, response, error in
+            guard
+                let httpResponse = response as? HTTPURLResponse, httpResponse.hasSuccessStatusCode,
+                let data = data
+                else {
+                    completion(Result.failure(ResponseError.rede))
+                    return
+            }
+            let downloadedImage = UIImage(data: data)!
+            imgCache.setObject(downloadedImage, forKey: url as AnyObject)
+            let image = CategoriaImageUrlResponse.init(categoriaImage: downloadedImage)
+            completion(Result.success(image))
+        }).resume()
+    }
+    
 }

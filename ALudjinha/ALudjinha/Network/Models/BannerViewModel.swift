@@ -7,11 +7,10 @@
 //
 
 import Foundation
-import UIKit
 
 protocol BannerViewModelDelegate: class {
-    func fetchCompleted()
-    func fetchFailed(with reason: String)
+    func fetchBannersCompleted()
+    func fetchBannersFailed(with reason: String)
 }
 
 final class BannerViewModel {
@@ -33,14 +32,6 @@ final class BannerViewModel {
         return banners[index]
     }
     
-    func bannersUrls() -> [String]? {
-        var finalString: [String] = []
-        for banner in self.banners {
-            finalString.append(banner.urlImagem)
-        }
-        return finalString
-    }
-    
     func fetchBanners() {
         guard !isFetching else {
             return
@@ -51,14 +42,13 @@ final class BannerViewModel {
             case .failure(let error):
                 DispatchQueue.main.async {
                     self.isFetching = false
-                    self.delegate?.fetchFailed(with: error.reason)
+                    self.delegate?.fetchBannersFailed(with: error.reason)
                 }
             case .success(let response):
                 DispatchQueue.main.async {
-                    print("BANNERS URL = \(response.banner)")
                     self.banners.append(contentsOf: response.banner)
                     self.isFetching = false
-                    self.delegate?.fetchCompleted()
+                    self.delegate?.fetchBannersCompleted()
                 }
             }
         }
