@@ -13,11 +13,13 @@ class MaisVendidosTableViewCell: UITableViewCell {
     @IBOutlet weak var precoDeLabel: UILabel!
     @IBOutlet weak var precoPorLabel: UILabel!
     @IBOutlet weak var produtoImageView: UIImageView!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     
     override func awakeFromNib() {
         super.awakeFromNib()
         produtoImageView.image = #imageLiteral(resourceName: "placeholder")
+        activityIndicator.hidesWhenStopped = true
     }
 
     override func prepareForReuse() {
@@ -31,21 +33,17 @@ class MaisVendidosTableViewCell: UITableViewCell {
             titleLabel?.text = produto.nome
             precoDeLabel.text = ("De: \(produto.precoDe)")
             precoPorLabel.text = String(format: "Por %.2f", produto.precoPor)
-//            activityIndicator.startAnimating()
-//            activityIndicator.isHidden = false
+            activityIndicator.startAnimating()
             produtoImageView.loadCategWithUrl(categUrl: produto.urlImagem) { result in
                 switch result {
                 case .failure(let error):
                     DispatchQueue.main.async {
-                        //self.activityIndicator.stopAnimating()
-                        //self.activityIndicator.isHidden = true
-
+                        self.activityIndicator.stopAnimating()
                     }
                     debugPrint("Erro ao baixar imagem: \(error.reason)")
                 case .success(let response):
                     DispatchQueue.main.async {
-                        //self.activityIndicator.stopAnimating()
-                        //self.activityIndicator.isHidden = true
+                        self.activityIndicator.stopAnimating()
                         self.produtoImageView.image = response.categoriaImage
                     }
                 }

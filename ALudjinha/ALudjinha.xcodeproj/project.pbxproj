@@ -12,6 +12,7 @@
 		7D45000422C6501D00564272 /* Produto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D45000322C6501D00564272 /* Produto.swift */; };
 		7D45000622C6537400564272 /* ProdutosViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D45000522C6537400564272 /* ProdutosViewModel.swift */; };
 		7D45000822C6546F00564272 /* MaisVendidosResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D45000722C6546F00564272 /* MaisVendidosResponse.swift */; };
+		7D45000A22C694DE00564272 /* ProdutoDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D45000922C694DE00564272 /* ProdutoDetailViewController.swift */; };
 		7D45FFF822C63BC100564272 /* MaisVendidosTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D45FFF722C63BC100564272 /* MaisVendidosTableViewCell.swift */; };
 		7D45FFFA22C63BD900564272 /* CategoriasCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D45FFF922C63BD900564272 /* CategoriasCollectionViewCell.swift */; };
 		7D45FFFC22C63CC200564272 /* CategoriasViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D45FFFB22C63CC200564272 /* CategoriasViewModel.swift */; };
@@ -41,6 +42,7 @@
 		7D45000322C6501D00564272 /* Produto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Produto.swift; sourceTree = "<group>"; };
 		7D45000522C6537400564272 /* ProdutosViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProdutosViewModel.swift; sourceTree = "<group>"; };
 		7D45000722C6546F00564272 /* MaisVendidosResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaisVendidosResponse.swift; sourceTree = "<group>"; };
+		7D45000922C694DE00564272 /* ProdutoDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProdutoDetailViewController.swift; sourceTree = "<group>"; };
 		7D45FFF722C63BC100564272 /* MaisVendidosTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaisVendidosTableViewCell.swift; sourceTree = "<group>"; };
 		7D45FFF922C63BD900564272 /* CategoriasCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriasCollectionViewCell.swift; sourceTree = "<group>"; };
 		7D45FFFB22C63CC200564272 /* CategoriasViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoriasViewModel.swift; sourceTree = "<group>"; };
@@ -147,6 +149,7 @@
 				A7F759E522C457AF007D7D04 /* HomeViewController.swift */,
 				A7F759E722C457BC007D7D04 /* SobreViewController.swift */,
 				A7F759E922C457DF007D7D04 /* MainTabBarController.swift */,
+				7D45000922C694DE00564272 /* ProdutoDetailViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -259,6 +262,7 @@
 				7D45000622C6537400564272 /* ProdutosViewModel.swift in Sources */,
 				A7F759CD22C44D9F007D7D04 /* AppDelegate.swift in Sources */,
 				7D45FFF822C63BC100564272 /* MaisVendidosTableViewCell.swift in Sources */,
+				7D45000A22C694DE00564272 /* ProdutoDetailViewController.swift in Sources */,
 				7DCF409122C53E0800994D84 /* ResponseError.swift in Sources */,
 				7DCF409722C53EEF00994D84 /* BannerResponse.swift in Sources */,
 				7DCF40A522C5562C00994D84 /* BannerImageUrlResponse.swift in Sources */,

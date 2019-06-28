@@ -28,9 +28,9 @@ class HomeViewController: UIViewController, Alerts {
         categsViewModel = CategoriasViewModel(delegate: self)
         produtosViewModel = ProdutosViewModel(delegate: self)
         scrollView.delegate = self
-        //tableView.delegate = self
+        tableView.delegate = self
         tableView.dataSource = self
-        //collectionView.delegate = self
+        collectionView.delegate = self
         collectionView.dataSource = self
         preLoadBannersView()
         bannerViewModel.fetchBanners()
@@ -132,7 +132,12 @@ extension HomeViewController: BannerViewModelDelegate {
     }
 }
 
+extension HomeViewController: UITableViewDelegate {
+    
+}
+
 extension HomeViewController: UITableViewDataSource {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if produtosViewModel.maisVendidosCount > 0 {
             return produtosViewModel.maisVendidosCount
@@ -151,9 +156,31 @@ extension HomeViewController: UITableViewDataSource {
         return cell
     }
     
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "Mais Vendidos"
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let produtoToPresent = produtosViewModel.maisVendidos(at: indexPath.item)
+        let produtoDetailVC = storyboard?.instantiateViewController(withIdentifier: "produtoDetailVC") as! ProdutoDetailViewController
+        produtoDetailVC.produto = produtoToPresent
+        tableView.deselectRow(at: indexPath, animated: false)
+        if let navVC = self.navigationController {
+            navVC.pushViewController(produtoDetailVC, animated: true)
+        }else {
+            let navVC = UINavigationController(rootViewController: produtoDetailVC)
+            present(navVC, animated: true, completion: nil)
+        }
+    }
+    
+}
+
+extension HomeViewController: UICollectionViewDelegate {
+    
 }
 
 extension HomeViewController: UICollectionViewDataSource {
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if categsViewModel.currentCount > 0 {
             return categsViewModel.currentCount
@@ -169,14 +196,13 @@ extension HomeViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "collectionCell", for: indexPath) as! CategoriasCollectionViewCell
         if categsViewModel.currentCount > 0 {
-            cell.setCell(with: categsViewModel.categorias(at: indexPath.item))
+            cell.setCell(with: categsViewModel.categorias(at: indexPath.row))
         } else {
             cell.backgroundView?.backgroundColor = .blue
             cell.setCell(with: .none)
         }
         return cell
     }
-    
     
 }
 
