@@ -11,6 +11,9 @@ import Foundation
 protocol ProdutosViewModelDelegate: class {
     func fetchMaisVendidosCompleted()
     func fetchMaisVendidosFailed(with reason: String)
+    func fetchProdutosCompleted()
+    func fetchProdutosFailed(with reason: String)
+    
 }
 
 final class ProdutosViewModel {
@@ -25,17 +28,17 @@ final class ProdutosViewModel {
         self.delegate = delegate
     }
     
-//    var currentCount: Int {
-//        return produtos.count
-//    }
+    var currentCount: Int {
+        return produtos.count
+    }
     
     var maisVendidosCount: Int {
         return maisVendidos.count
     }
     
-//    func produto(at index: Int) -> Produto {
-//        return produtos[index]
-//    }
+    func produto(at index: Int) -> Produto {
+        return produtos[index]
+    }
     
     func maisVendidos(at index: Int) -> Produto {
         return maisVendidos[index]
@@ -58,6 +61,28 @@ final class ProdutosViewModel {
                     self.maisVendidos.append(contentsOf: response.produtos)
                     self.isFetching = false
                     self.delegate?.fetchMaisVendidosCompleted()
+                }
+            }
+        }
+    }
+    
+    func fetchProdutos() {
+        guard !isFetching else {
+            return
+        }
+        isFetching = true
+        client.fetchProdutos() { result in
+            switch result {
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    self.isFetching = false
+                    self.delegate?.fetchProdutosFailed(with: error.reason)
+                }
+            case .success(let response):
+                DispatchQueue.main.async {
+                    self.produtos.append(contentsOf: response.produtos)
+                    self.isFetching = false
+                    self.delegate?.fetchProdutosCompleted()
                 }
             }
         }

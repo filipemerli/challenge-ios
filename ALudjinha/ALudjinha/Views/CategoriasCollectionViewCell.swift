@@ -9,9 +9,14 @@
 import UIKit
 
 class CategoriasCollectionViewCell: UICollectionViewCell {
+    
+    // MARK: - Properties
+
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var imageView: UIImageView!
+    
+    //MARK: Preloads
     
     override func prepareForReuse() {
         super.prepareForReuse()
@@ -24,7 +29,8 @@ class CategoriasCollectionViewCell: UICollectionViewCell {
     }
     
     //MARK: Configure cell
-    func setCell(with categ: Categoria?) {
+    
+    public func setCell(with categ: Categoria?) {
         if let categ = categ {
             titleLabel?.text = categ.descricao
             imageView.loadCategWithUrl(categUrl: categ.urlImagem) { result in
@@ -34,7 +40,6 @@ class CategoriasCollectionViewCell: UICollectionViewCell {
                         self.activityIndicator.stopAnimating()
                         self.imageView.image = #imageLiteral(resourceName: "placeholder")
                     }
-                    debugPrint("Erro ao baixar imagem: \(error.reason)")
                 case .success(let response):
                     DispatchQueue.main.async {
                         self.activityIndicator.stopAnimating()

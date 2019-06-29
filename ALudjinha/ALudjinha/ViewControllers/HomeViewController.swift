@@ -9,6 +9,8 @@
 import UIKit
 
 class HomeViewController: UIViewController, Alerts {
+    
+    // MARK: - Properties
 
     @IBOutlet weak var pageControl: UIPageControl!
     @IBOutlet weak var scrollView: UIScrollView!
@@ -19,20 +21,23 @@ class HomeViewController: UIViewController, Alerts {
     private var categsViewModel: CategoriasViewModel!
     private var produtosViewModel: ProdutosViewModel!
     var numberOfScrolls = CGFloat(3)
+    private let sectionInsets = UIEdgeInsets(top: 1.0, left: 1.0, bottom: 1.0, right: 1.0)
     private var bannersImageView: [UIImageView] = []
     private var bannerActivityInd: [UIActivityIndicatorView] = []
     
+    
+    // MARK: - View Controller Delegates
+
     override func viewDidLoad() {
         super.viewDidLoad()
         bannerViewModel = BannerViewModel(delegate: self)
         categsViewModel = CategoriasViewModel(delegate: self)
         produtosViewModel = ProdutosViewModel(delegate: self)
-        scrollView.delegate = self
-        tableView.delegate = self
         tableView.dataSource = self
-        collectionView.delegate = self
+        scrollView.delegate = self
         collectionView.dataSource = self
-        preLoadBannersView()
+        collectionView.delegate = self
+        tableView.delegate = self
         bannerViewModel.fetchBanners()
         categsViewModel.fetchCategorias()
         produtosViewModel.fetchMaisVendidos()
@@ -45,11 +50,12 @@ class HomeViewController: UIViewController, Alerts {
         imageView.contentMode = .scaleAspectFill
         imageView.image = #imageLiteral(resourceName: "logoNavbar")
         navigationBar?.topItem?.titleView = imageView
+        preLoadBannersView()
         setUpScrollBanners()
         getDotsFeedback()
-        bannerViewModel.fetchBanners()
-        categsViewModel.fetchCategorias()
     }
+
+    // MARK: - ViewController Privates Functions
 
     func preLoadBannersView() {
         self.scrollView.frame = CGRect(x: 0, y: 0, width: bannerView.frame.width, height: bannerView.frame.height)
@@ -71,7 +77,7 @@ class HomeViewController: UIViewController, Alerts {
         }
     }
     
-    func setUpScrollBanners() {
+    private func setUpScrollBanners() {
         if (bannerViewModel.currentCount > 0) {
             for i in 0..<Int(numberOfScrolls) {
                 bannersImageView[i].loadBannerWithUrl(bannerUrl: bannerViewModel.banner(at: i).urlImagem) { result in
@@ -99,7 +105,7 @@ class HomeViewController: UIViewController, Alerts {
         
     }
     
-    @IBAction func moveToPage(_ sender: UIPageControl) {
+    @IBAction private func moveToPage(_ sender: UIPageControl) {
         let page: Int? = sender.currentPage
         var frame: CGRect = scrollView.frame
         frame.origin.x = frame.size.width * CGFloat(page ?? 0)
@@ -107,12 +113,14 @@ class HomeViewController: UIViewController, Alerts {
         scrollView.scrollRectToVisible(frame, animated: true)
     }
     
-    func getDotsFeedback() {
+    private func getDotsFeedback() {
         let pageWidth = bannerView.frame.width
         let currentPage = floor((scrollView.contentOffset.x - pageWidth / 2) / pageWidth) + 1
         pageControl.currentPage = Int(currentPage)
     }
 }
+
+    // MARK: - UITableViewDataSource
 
 extension HomeViewController: UIScrollViewDelegate {
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView){
@@ -120,6 +128,8 @@ extension HomeViewController: UIScrollViewDelegate {
     }
     
 }
+
+    // MARK: - UITableViewDataSource
 
 extension HomeViewController: BannerViewModelDelegate {
     func fetchBannersCompleted() {
@@ -132,12 +142,9 @@ extension HomeViewController: BannerViewModelDelegate {
     }
 }
 
-extension HomeViewController: UITableViewDelegate {
-    
-}
+    // MARK: - UITableViewDataSource
 
 extension HomeViewController: UITableViewDataSource {
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if produtosViewModel.maisVendidosCount > 0 {
             return produtosViewModel.maisVendidosCount
@@ -175,9 +182,7 @@ extension HomeViewController: UITableViewDataSource {
     
 }
 
-extension HomeViewController: UICollectionViewDelegate {
-    
-}
+    // MARK: - UICollectionViewDataSource
 
 extension HomeViewController: UICollectionViewDataSource {
     
@@ -204,7 +209,21 @@ extension HomeViewController: UICollectionViewDataSource {
         return cell
     }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let produtosVC = storyboard?.instantiateViewController(withIdentifier: "produtosVC") as! TableViewController
+        produtosVC.categTitle = "\(self.categsViewModel.categorias(at: indexPath.row).descricao)"
+        collectionView.deselectItem(at: indexPath, animated: false)
+        if let navVC = self.navigationController {
+            navVC.pushViewController(produtosVC, animated: true)
+        }else {
+            let navVC = UINavigationController(rootViewController: produtosVC)
+            present(navVC, animated: true, completion: nil)
+        }
+    }
+    
 }
+
+    // MARK: - CategoriasViewModelDelegate
 
 extension HomeViewController: CategoriasViewModelDelegate {
     func fetchCategsCompleted() {
@@ -220,6 +239,8 @@ extension HomeViewController: CategoriasViewModelDelegate {
     }
 }
 
+    // MARK: - ProdutosViewModelDelegate
+
 extension HomeViewController: ProdutosViewModelDelegate {
     func fetchMaisVendidosCompleted() {
         DispatchQueue.main.async {
@@ -233,5 +254,38 @@ extension HomeViewController: ProdutosViewModelDelegate {
         displayAlert(with: title , message: reason, actions: [action])
     }
     
+    func fetchProdutosCompleted() {
+        //
+    }
+    
+    func fetchProdutosFailed(with reason: String) {
+        //
+    }
+    
+}
+
+extension HomeViewController: UICollectionViewDelegate {
+    
+}
+
+extension HomeViewController: UITableViewDelegate {
+    
+}
+
+extension HomeViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let paddingSpace = sectionInsets.left * (2)
+        let availableWidth = collectionView.frame.width - paddingSpace
+        let widthPerItem = availableWidth / 4
+        return CGSize(width: widthPerItem, height: (widthPerItem))
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return sectionInsets
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return sectionInsets.left
+    }
     
 }

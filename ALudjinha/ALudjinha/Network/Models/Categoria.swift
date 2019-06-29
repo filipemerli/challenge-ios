@@ -7,7 +7,7 @@
 //
 
 import Foundation
-struct Categoria: Decodable {
+struct Categoria {
     let descricao: String
     let id: Int
     let urlImagem: String
@@ -22,6 +22,9 @@ struct Categoria: Decodable {
         self.urlImagem = urlImagem
     }
     
+}
+
+extension Categoria: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let descricao = try container.decode(String.self, forKey: .descricao)
@@ -29,5 +32,13 @@ struct Categoria: Decodable {
         let urlImagem = try container.decode(String.self, forKey: .urlImagem)
         self.init(descricao: descricao, id: id, urlImagem: urlImagem)
     }
-    
+}
+
+extension Categoria: Encodable {
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(descricao, forKey: .descricao)
+        try container.encode(id, forKey: .id)
+        try container.encode(urlImagem, forKey: .urlImagem)
+    }
 }

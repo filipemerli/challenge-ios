@@ -1,13 +1,13 @@
 //
-//  MaisVendidosResponse.swift
+//  ProdutosResponse.swift
 //  ALudjinha
 //
-//  Created by Filipe on 28/06/19.
+//  Created by Filipe Merli on 29/06/19.
 //  Copyright © 2019 Filipe Merli. All rights reserved.
 //
 
 import Foundation
-struct MaisVendidosResponse: Decodable {
+struct ProdutosResponse: Decodable {
     let produtos: [Produto]
     
     enum CodingKeys: String, CodingKey {

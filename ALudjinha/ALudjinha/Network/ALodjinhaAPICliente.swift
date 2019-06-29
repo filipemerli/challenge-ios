@@ -17,6 +17,7 @@ final class ALodjinhaAPIClient {
     let pathBanner = "banner"
     let pathCategoria = "categoria"
     let pathMaisVendidos = "produto/maisvendidos"
+    let pathProdutos = "produto"
     
     init(session: URLSession = URLSession.shared) {
         self.session = session
@@ -58,7 +59,7 @@ final class ALodjinhaAPIClient {
         }).resume()
     }
     
-    func fetchProdutosMaisVendidos(completion: @escaping (Result<MaisVendidosResponse, ResponseError>) -> Void) {
+    func fetchProdutosMaisVendidos(completion: @escaping (Result<ProdutosResponse, ResponseError>) -> Void) {
         let urlRequest = URLRequest(url: corpoURL.appendingPathComponent(pathMaisVendidos))
         session.dataTask(with: urlRequest, completionHandler: { data, response, error in
             guard
@@ -68,7 +69,45 @@ final class ALodjinhaAPIClient {
                     completion(Result.failure(ResponseError.rede))
                     return
             }
-            guard let decodedResponse = try? JSONDecoder().decode(MaisVendidosResponse.self, from: data) else {
+            guard let decodedResponse = try? JSONDecoder().decode(ProdutosResponse.self, from: data) else {
+                completion(Result.failure(ResponseError.decoding))
+                return
+            }
+            completion(Result.success(decodedResponse))
+        }).resume()
+    }
+    
+    func fetchProdutos(completion: @escaping (Result<ProdutosResponse, ResponseError>) -> Void) {
+        let urlRequest = URLRequest(url: corpoURL.appendingPathComponent(pathProdutos))
+        session.dataTask(with: urlRequest, completionHandler: { data, response, error in
+            guard
+                let httpResponse = response as? HTTPURLResponse, httpResponse.hasSuccessStatusCode,
+                let data = data
+                else {
+                    completion(Result.failure(ResponseError.rede))
+                    return
+            }
+            guard let decodedResponse = try? JSONDecoder().decode(ProdutosResponse.self, from: data) else {
+                completion(Result.failure(ResponseError.decoding))
+                return
+            }
+            completion(Result.success(decodedResponse))
+        }).resume()
+    }
+    
+    func postProduto(id: Int, completion: @escaping (Result<PostProdutoResponse, ResponseError>) -> Void) {
+        let produtoId = "\(pathProdutos)/\(id)"
+        var urlRequest = URLRequest(url: corpoURL.appendingPathComponent(produtoId))
+        urlRequest.httpMethod = "POST"
+        session.dataTask(with: urlRequest, completionHandler: { data, response, error in
+            guard
+                let httpResponse = response as? HTTPURLResponse, httpResponse.hasSuccessStatusCode,
+                let data = data
+                else {
+                    completion(Result.failure(ResponseError.rede))
+                    return
+            }
+            guard let decodedResponse = try? JSONDecoder().decode(PostProdutoResponse.self, from: data) else {
                 completion(Result.failure(ResponseError.decoding))
                 return
             }
